@@ -1,0 +1,5 @@
+# Archivos de entorno - ¡NUNCA SUBIR!
+.env
+
+# Dependencias de Node
+/node_modules
