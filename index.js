@@ -17,9 +17,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // --- FIN DE LA CONFIGURACIÓN ---
 
 app.use(cors({
-    // Permitir solicitudes solo desde el dominio donde se ejecuta la extensión
-    // Si la extensión se ejecuta en otros dominios, añádelos a la lista.
-    origin: ['https://www.apuestatotal.com', 'https://www.bet365.com']
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
@@ -1795,6 +1795,22 @@ app.post('/api/tickets/:id/verify', async (req, res) => {
     } catch (error) {
         console.error("Error durante la verificación:", error.message);
         res.status(500).json({ message: 'Error en el servidor durante la verificación.', error: error.message });
+    }
+});
+
+// --- ENDPOINT PARA OBTENER TODOS LOS TICKETS ---
+app.get('/api/tickets', async (req, res) => {
+    try {
+        // Obtenemos todos los tickets y sus partidos asociados
+        const { data: tickets, error } = await supabase
+            .from('Tickets')
+            .select('*, Partidos(*)')
+            .order('id', { ascending: false });
+        if (error) throw new Error(error.message);
+        res.status(200).json({ tickets });
+    } catch (error) {
+        console.error('Error al obtener los tickets:', error.message);
+        res.status(500).json({ message: 'Error al obtener los tickets', error: error.message });
     }
 });
 
