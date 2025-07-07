@@ -1814,6 +1814,24 @@ app.get('/api/tickets', async (req, res) => {
     }
 });
 
+// --- ENDPOINT PARA OBTENER UN TICKET POR ID ---
+app.get('/api/tickets/:id', async (req, res) => {
+    const ticketId = req.params.id;
+    try {
+        const { data: ticket, error } = await supabase
+            .from('Tickets')
+            .select('*, Partidos(*)')
+            .eq('id', ticketId)
+            .single();
+        if (error) throw new Error(error.message);
+        if (!ticket) return res.status(404).json({ message: 'Ticket no encontrado.' });
+        res.status(200).json({ ticket });
+    } catch (error) {
+        console.error('Error al obtener el ticket:', error.message);
+        res.status(500).json({ message: 'Error al obtener el ticket', error: error.message });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
     console.log("El backend está listo para recibir tickets.");
